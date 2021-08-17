@@ -14,7 +14,7 @@ JAW_MARK = 8
 # colors of the mask
 MASKS = ["white", "black", "black_grey", "white_grey", "grey"]
 # number of images to fix
-COUNT = 1  # 1000 exactly
+COUNT = 1  # 1000 exactly (1: for debugging)
 # size of the images  # NEED TO FIX THIS
 SIZE = {"face": 500, "mask": 100}
 
@@ -28,7 +28,7 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 for i in range(COUNT):
     # target = target_dir + str(i) + pic_type
-    target = "faces_dataset/sample_2.jpg"
+    target = "faces_dataset/sample_2.jpg"  # for debugging
     # load an image to detect
     img = cv2.imread(target)
     # convert the image into grayscale
