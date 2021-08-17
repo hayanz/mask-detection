@@ -21,11 +21,11 @@ for face in faces:
     x1, x2 = face.left(), face.right()
     y1, y2 = face.top(), face.bottom()
 
-    landmarks = predictor(image=gray, box=face)
+    facemarks = predictor(image=gray, box=face)
 
     for i in range(FACEMARKS["nose"][0], FACEMARKS["nose"][1]):
-        x = landmarks.part(i).x
-        y = landmarks.part(i).y
+        x = facemarks.part(i).x
+        y = facemarks.part(i).y
 
         # draw a circle
         # cv2.circle(img=img, center=(x, y), radius=3, color=(0, 255, 0), thickness=1)
