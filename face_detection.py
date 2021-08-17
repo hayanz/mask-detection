@@ -1,11 +1,8 @@
 from collections import OrderedDict
-import imutils.face_utils as face_utils
-import imutils
-import numpy as np
-import dlib
 import cv2
+import dlib
 
-
+# marks for detecting the face with the predictor
 FACEMARKS = OrderedDict([("mouth", (48, 68)), ("r_eyebrow", (17, 22)), ("l_eyebrow", (22, 27)),
                          ("r_eye", (36, 42)), ("l_eye", (42, 48)), ("nose", (27, 35)),
                          ("jaw", (0, 17))])
@@ -18,7 +15,6 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 img = cv2.imread("faces_dataset/sample.jpg")
 # convert the image into grayscale
 gray = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
-# detector of the
 faces = detector(gray)
 
 for face in faces:
@@ -35,7 +31,7 @@ for face in faces:
         # cv2.circle(img=img, center=(x, y), radius=3, color=(0, 255, 0), thickness=1)
 
     # draw a border of the face
-    # cv2.rectangle(img, (x1, y1), (x2, y2), color=(255, 0, 0), thickness=4)
+    cv2.rectangle(img, (x1, y1), (x2, y2), color=(255, 0, 0), thickness=4)
 
 cv2.imshow("example", mat=img)
 cv2.waitKey(0)
