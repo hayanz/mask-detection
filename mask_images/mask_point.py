@@ -71,14 +71,12 @@ class Mask(object):
     # save the image as the new one
     def save_as(self, filename, filetype, filepath=None):
         valid_type = {"PNG": ".png", "JPEG": ".jpeg", "JPG": ".jpg"}
-
         try:
             if filetype not in valid_type:
                 raise TypeError
         except TypeError:
             print("Invalid type.")  # print the error message
             return  # make the program ends
-
         # save the image
         filename = filename + valid_type[filetype]
         if filepath is not None:
