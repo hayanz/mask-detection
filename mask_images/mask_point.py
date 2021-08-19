@@ -43,14 +43,14 @@ class Mask(object):
                             borders.append((col, row))
         return borders
 
-    # find the coordinate of the mask that would be the 
+    # find the coordinate of the mask that would be the
     def find_topbottom(self):
-        topbottom = []  # an empty list to save the result
+        points = []  # an empty list to save the result
         borders = self.find_borders()
         for pixel in borders:
             if pixel[0] == self.width / 2:
-                topbottom.append(pixel)
-        return topbottom
+                points.append(pixel)
+        return points
 
     # for debugging
     def show_points(self):
