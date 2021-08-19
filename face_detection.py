@@ -14,14 +14,15 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 # load an image to detect
 img = cv2.imread("faces_dataset/sample.jpg")
 # convert the image into grayscale
-gray = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
-faces = detector(gray)
+grey = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
+faces = detector(grey)
 
 for face in faces:
     x1, x2 = face.left(), face.right()
     y1, y2 = face.top(), face.bottom()
+    # print((x1, x2), (y1, y2))  # for debugging
 
-    facemarks = predictor(image=gray, box=face)
+    facemarks = predictor(image=grey, box=face)
 
     for i in range(FACEMARKS["nose"][0], FACEMARKS["nose"][1]):
         x = facemarks.part(i).x
