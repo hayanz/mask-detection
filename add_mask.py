@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from PIL import Image
 import numpy as np
 import cv2
@@ -6,6 +5,9 @@ import dlib
 import os
 import random
 import shutil
+
+# import the custom module
+from mask_images.mask_point import Mask
 
 # marks for detecting the face with the predictor
 NOSE_MARK = 30
@@ -40,13 +42,17 @@ for i in range(COUNT):
         # y1, y2 = face.top(), face.bottom()
 
         facemarks = predictor(image=gray, box=face)
+        # calculate the point to paste the mask image
         mask_nose = [facemarks.part(NOSE_MARK).x, facemarks.part(NOSE_MARK).y]
         mask_jaw = [facemarks.part(JAW_MARK).x, facemarks.part(JAW_MARK).y]
-        # print(mask_nose, mask_jaw)  # for debugging
+        mask_center = tuple(int(np.mean(n)) for n in zip(mask_jaw, mask_nose))
 
+    with Image.open(target) as pil_img:
         mask_file = "mask_images/" + random.choice(MASKS) + ".png"
         mask = Image.open(mask_file)
-
         # NEED TO FIX THIS --> not implemented yet
         # resize images with pillow -> put the mask on the target image
         # pick 1000 images to use and change the value of 'COUNT' to 1000
+
+        # pil_img.paste(mask, mask_center)
+        # pil_img.show()
