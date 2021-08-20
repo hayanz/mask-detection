@@ -11,21 +11,24 @@ from person_image import Person
 # colors of the mask
 MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png"]
 # number of images to fix
-COUNT = 5  # 1000 exactly (5: for debugging)
+COUNT = 1000
 
 # path of the images
 target_dir = "faces_dataset/picked_mask/"
 mask_dir = "mask_images/"
 
-for i in range(COUNT):
+start_idx = 200
+
+for i in range(start_idx, COUNT):
     # define the class to access the image
-    person = Person("faces_dataset/sample_" + str(i) + ".jpg")  # class of the person image
+    person = Person(target_dir + str(i) + ".jpg")  # class of the person image
     # get the value of the length of the lower face to resize the mask image
     length = int(person.lower_length)
 
     # pick the color of the mask and define the class to access the image
     img = person.img.convert("RGBA")
-    maskfile = mask_dir + random.choice(MASKS)
+    # maskfile = mask_dir + random.choice(MASKS)
+    maskfile = mask_dir + "white.png"
     mask = Mask(maskfile)  # class of the mask image
 
     # calculate the size with the ratio of the mask image
@@ -38,6 +41,6 @@ for i in range(COUNT):
     # paste the mask image to the original face image
     combined = person.put_mask(mask.img, coordinate)
     combined = combined.convert("RGB")
-    combined.show()  # for debugging
-    combined.save("faces_dataset/tested" + str(i) + ".jpg")
+    # combined.show()  # for debugging
+    combined.save(target_dir + str(i) + ".jpg")
     print("[%d] Successfully Done!" % i)  # for debugging
