@@ -1,4 +1,5 @@
 from PIL import Image
+import numpy as np
 import cv2
 
 
@@ -15,11 +16,11 @@ def find_neighbors(img, col, row):
 class Mask(object):
     def __init__(self, filename):
         self.filename = filename
-        self.img = Image.open(filename)
+        self.img = Image.open(filename).convert("RGBA")
         self.width, self.height = self.img.size
 
     # resize the image
-    def resize(self, width, height, returned=True):
+    def resize(self, width, height, returned=False):
         # initial size of the mask is 1200 * 1200
         resized = self.img.resize((width, height))
         if returned:  # return as the new object
@@ -30,7 +31,7 @@ class Mask(object):
     # find the coordinate of pixels at the border of the image
     def find_borders(self):
         borders = []  # an empty list to save the coordinate of pixels
-        img = self.img.convert("RGBA")
+        img = self.img
         for col in range(img.size[0]):  # img.size[0] = width
             for row in range(img.size[1]):  # img.size[1] = height
                 # (the value of column, the value of row) = the coordinate of the pixel
@@ -49,8 +50,21 @@ class Mask(object):
         borders = self.find_borders()
         for pixel in borders:
             if pixel[0] == self.width / 2:
-                points.append(pixel)
+                points.append(list(pixel))
         return points
+
+    # find the coordinate of the center of the mask image
+    def find_center(self):
+        top, bottom = self.find_topbottom()
+        center = [np.mean(n) for n in zip(top, bottom)]
+        return center
+
+    # get the ratio between the entire length of the image and the mask
+    def get_ratio(self):
+        top, bottom = self.find_topbottom()
+        # calculate the length of the mask using coordinates
+        mask_length = float([abs(p - q) for p, q in zip(top, bottom)][1])
+        return self.height / mask_length
 
     # for debugging
     def show_points(self):
@@ -91,8 +105,10 @@ class Mask(object):
 # for debugging
 if __name__ == "__main__":
     test = Mask("mask_images/black_grey.png")
-    test.resize(600, 600, returned=True).save("mask_images/test.png")
+    # resize the image (1200 = original size)
+    test.resize(1200, 1200, returned=True).save("mask_images/test.png")
     test2 = Mask("mask_images/test.png")
-    test2.find_topbottom()
+    test2.find_center()
+    print(test2.get_ratio())  # for testing the method
     # test2.show_points()
     test.close()
