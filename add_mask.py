@@ -2,9 +2,7 @@ from PIL import Image
 import numpy as np
 import cv2
 import dlib
-import os
 import random
-import shutil
 
 # import the custom modules
 from mask_images.mask_image import Mask
