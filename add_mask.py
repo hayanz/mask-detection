@@ -6,53 +6,40 @@ import os
 import random
 import shutil
 
-# import the custom module
-from mask_images.mask_point import Mask
-
-# marks for detecting the face with the predictor
-NOSE_MARK = 30
-JAW_MARK = 8
+# import the custom modules
+from mask_images.mask_image import Mask
+from person_image import Person
 
 # colors of the mask
-MASKS = ["white", "black", "black_grey", "white_grey", "grey"]
+MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png"]
 # number of images to fix
-COUNT = 1  # 1000 exactly (1: for debugging)
-# size of the images  # NEED TO FIX THIS
-SIZE = {"face": 500, "mask": 100}
+COUNT = 5  # 1000 exactly (1: for debugging)
 
 # path of the images
 target_dir = "faces_dataset/picked_mask/"
-pic_type = ".jpg"
-
-detector = dlib.get_frontal_face_detector()
-# http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+mask_dir = "mask_images/"
 
 for i in range(COUNT):
-    # target = target_dir + str(i) + pic_type
-    target = "faces_dataset/sample_2.jpg"  # for debugging
-    # load an image to detect
-    img = cv2.imread(target)
-    # convert the image into grayscale
-    gray = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
-    faces = detector(gray)
+    # define the class to access the image
+    person = Person("faces_dataset/sample_" + str(i) + ".jpg")  # class of the person image
+    # get the value of the length of the lower face to resize the mask image
+    length = int(person.lower_length)
 
-    for face in faces:
-        # x1, x2 = face.left(), face.right()
-        # y1, y2 = face.top(), face.bottom()
+    # pick the color of the mask and define the class to access the image
+    img = person.img.convert("RGBA")
+    maskfile = mask_dir + random.choice(MASKS)
+    mask = Mask(maskfile)  # class of the mask image
 
-        facemarks = predictor(image=gray, box=face)
-        # calculate the point to paste the mask image
-        mask_nose = [facemarks.part(NOSE_MARK).x, facemarks.part(NOSE_MARK).y]
-        mask_jaw = [facemarks.part(JAW_MARK).x, facemarks.part(JAW_MARK).y]
-        mask_center = tuple(int(np.mean(n)) for n in zip(mask_jaw, mask_nose))
+    # calculate the size with the ratio of the mask image
+    size = int(round(length * mask.get_ratio()))
+    mask.resize(size, size)  # resized
 
-    with Image.open(target) as pil_img:
-        mask_file = "mask_images/" + random.choice(MASKS) + ".png"
-        mask = Image.open(mask_file)
-        # NEED TO FIX THIS --> not implemented yet
-        # resize images with pillow -> put the mask on the target image
-        # pick 1000 images to use and change the value of 'COUNT' to 1000
-
-        # pil_img.paste(mask, mask_center)
-        # pil_img.show()
+    # calculate the coordinate of the center again with the size of the mask image
+    mask_center = mask.find_center()
+    coordinate = tuple(int(a - b) for a, b in zip(person.find_center(), mask_center))
+    # paste the mask image to the original face image
+    combined = person.put_mask(mask.img, coordinate)
+    combined = combined.convert("RGB")
+    combined.show()  # for debugging
+    combined.save("faces_dataset/tested" + str(i) + ".jpg")
+    print("[%d] Done!" % i)  # for debugging
