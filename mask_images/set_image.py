@@ -20,9 +20,10 @@ for color in COLORS.keys():
             # change the color only if the pixel is not transparent
             color_item = COLORS[color]
         else:
+
             color_item = (255, 255, 255, 0)
         new_data.append(color_item)
     img.putdata(new_data)
 
-    img.save(newfile)
-    img.show()
+    img.save(color + ".png")
+    img.show()  # for debugging
