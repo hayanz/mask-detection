@@ -42,4 +42,4 @@ for i in range(COUNT):
     combined = combined.convert("RGB")
     combined.show()  # for debugging
     combined.save("faces_dataset/tested" + str(i) + ".jpg")
-    print("[%d] Done!" % i)  # for debugging
+    print("[%d] Successfully Done!" % i)  # for debugging
