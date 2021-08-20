@@ -13,7 +13,7 @@ from person_image import Person
 # colors of the mask
 MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png"]
 # number of images to fix
-COUNT = 5  # 1000 exactly (1: for debugging)
+COUNT = 5  # 1000 exactly (5: for debugging)
 
 # path of the images
 target_dir = "faces_dataset/picked_mask/"
