@@ -12,7 +12,7 @@ def find_neighbors(img, col, row):
     return neighbors
 
 
-# class of the mask
+# class of the mask image
 class Mask(object):
     def __init__(self, filename):
         self.filename = filename
