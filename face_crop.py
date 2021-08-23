@@ -22,7 +22,7 @@ class Face(object):
             x1, x2 = face.left(), face.right()
             y1, y2 = face.top(), face.bottom()
             # draw a rectangle to show a border of the face
-            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            # cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         # cv2.imshow(winname="found faces", mat=img)  # for debugging
         # cv2.waitKey(3000)  # wait for 3 seconds
