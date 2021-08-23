@@ -12,7 +12,7 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # load an image to detect
-img = cv2.imread("faces_dataset/tested4.jpg")
+img = cv2.imread("faces_dataset/test0.jpg")
 # convert the image into grayscale
 grey = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
 faces = detector(grey)
@@ -35,5 +35,5 @@ for face in faces:
     cv2.rectangle(img, (x1, y1), (x2, y2), color=(255, 0, 0), thickness=4)
 
 cv2.imshow("example", mat=img)
-cv2.waitKey(0)
+cv2.waitKey(3000)  # wait for 3 seconds
 cv2.destroyAllWindows()
