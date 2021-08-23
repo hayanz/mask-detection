@@ -6,7 +6,7 @@ import shutil
 # https://susanqq.github.io/UTKFace/
 dir1 = "faces_dataset/part1/"  # directory of the pictures
 dir2 = "faces_dataset/part2/"  # directory of the pictures
-picked_dir = "faces_dataset/picked_mask/"
+picked_dir = "faces_dataset/picked_mask_cropped/"
 
 pic_type = ".jpg"
 count = 1000  # number of samples to use
