@@ -140,6 +140,7 @@ def classify(net, meta, im):
     res = sorted(res, key=lambda x: -x[1])
     return res
 
+
 def array_to_image(arr):
     arr = arr.transpose(2,0,1)
     c, h, w = arr.shape[0:3]
@@ -173,6 +174,7 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_detections(dets, num)
     return res
 
+
 def draw_bounding_box(img, item):
     color = tuple(np.random.randint(256, size=3))
     name, prob, box_info = item
@@ -187,9 +189,10 @@ def draw_bounding_box(img, item):
     # start = (x, y)
     # end = (x+xw,y+yh)
 
-    cv2.rectangle(img, start, end, color, 2)  # todo rectangle error  WHY??????
+    cv2.rectangle(img, start, end, color, 2)  # TODO exception occurred at first
     cv2.putText(img, name, (int(x - 10), int(y - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
     return img
+
 
 center_list = []
 def image_callback(img_msg):
@@ -205,6 +208,7 @@ def image_callback(img_msg):
             center_list.append((int(box_info[0]), int(box_info[1])))
     cv2.imshow('img', cv_image)
     cv2.waitKey(3)
+
 
 depth = None
 center_coordinate = []  # declared as 'None' before
@@ -225,9 +229,9 @@ def listener():
     rospy.Subscriber("/camera/depth_registered/points", PointCloud2, pc_callback)
     rospy.spin()
 
+
 net = load_net(makedir("cfg/yolov3-tiny.cfg"), makedir("yolov3-tiny.weights"), 0)
 meta = load_meta(makedir("cfg/coco.data"))
-
 
 if __name__ == "__main__":
     listener()
