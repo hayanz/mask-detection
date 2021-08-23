@@ -8,6 +8,7 @@ import random
 from mask_images.mask_image import Mask
 from person_image import Person
 from pick_samples import *  # to pick again if the face cannot be found at the picture
+from face_crop import Face  # to detect the face part and crop the image
 
 # colors of the mask
 MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png"]
@@ -15,10 +16,10 @@ MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png
 COUNT = 1000
 
 # path of the images
-target_dir = "faces_dataset/picked_mask/"
+target_dir = "faces_dataset/picked_mask_cropped/"
 mask_dir = "mask_images/"
 
-start_idx = 500
+start_idx = 0
 
 for i in range(start_idx, COUNT):
     while True:
@@ -28,8 +29,12 @@ for i in range(start_idx, COUNT):
             # get the value of the length of the lower face to resize the mask image
             length = int(person.lower_length)
 
+            # crop the face part
+            # cropped = Face(person.img).crop()  # TODO erase '#'
+
             # pick the color of the mask and define the class to access the image
             img = person.img.convert("RGBA")
+            # img = cropped.convert("RGBA")  # TODO erase '#'
             # maskfile = mask_dir + random.choice(MASKS)
             maskfile = mask_dir + "white.png"
             mask = Mask(maskfile)  # class of the mask image
@@ -54,3 +59,5 @@ for i in range(start_idx, COUNT):
             # ValueError: when the pixel of top and bottom are selected in duplicate
             pick_dir = random.choice([dir1, dir2])  # choose a directory randomly
             move_files(dir2, end=1, add_num=i)  # pick one picture randomly again
+
+# TODO crop the face part of the image and paste a mask image, then save as the training data
