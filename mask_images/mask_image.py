@@ -102,7 +102,7 @@ class Mask(object):
         self.img.close()
 
 
-# for debugging
+# for testing the code with some images
 if __name__ == "__main__":
     test = Mask("mask_images/black_grey.png")
     # resize the image (1200 = original size)

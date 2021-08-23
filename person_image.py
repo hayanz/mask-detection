@@ -72,7 +72,7 @@ class Person(object):
         return img
 
 
-# for debugging
+# for testing the code
 if __name__ == "__main__":
     person = Person("faces_dataset/sample_0.jpg")
     print(person.find_center())
