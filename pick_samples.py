@@ -9,9 +9,9 @@ dir2 = "faces_dataset/part2/"  # directory of the pictures
 picked_dir = "faces_dataset/picked_mask/"
 
 pic_type = ".jpg"
-count = 1  # number of samples to use
+count = 1000  # number of samples to use
 count_half = count / 2
-start_idx = 195  # starting index for counting the samples
+start_idx = 0  # starting index for counting the samples
 
 
 def move_files(target, start=0, end=count, add_num=0):
@@ -25,5 +25,6 @@ def move_files(target, start=0, end=count, add_num=0):
         print("[%d] Successfully picked!" % i)  # for debugging
 
 
-move_files(dir1, end=count_half, add_num=start_idx)  # pick samples from 'dir1'
-move_files(dir2, start=count_half, add_num=start_idx)  # pick samples from 'dir2'
+if __name__ == "__main__":
+    move_files(dir1, end=count_half, add_num=start_idx)  # pick samples from 'dir1'
+    move_files(dir2, start=count_half, add_num=start_idx)  # pick samples from 'dir2'
