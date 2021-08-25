@@ -12,14 +12,15 @@ from face_crop import Face  # to detect the face part and crop the image
 
 # colors of the mask
 MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png"]
-# number of images to fix
-COUNT = 1
+# number of images to fix (index of the endpoint)
+COUNT = 645
 
-# path of the images
+# path of images
 target_dir = "faces_dataset/picked_mask_cropped/"
 mask_dir = "mask_images/"
 
-start_idx = 0
+# index of the starting point
+start_idx = 644
 
 
 # to crop the image and save
@@ -29,7 +30,7 @@ def save_cropped(filename):
         cropped = target.crop()
         cv2.imwrite(filename, cropped)
         return True
-    except (UnboundLocalError, ValueError):
+    except (UnboundLocalError, ValueError, cv2.error):
         return False
 
 
@@ -68,11 +69,11 @@ if __name__ == "__main__":
                 combined = combined.convert("RGB")
                 # combined.show()  # for debugging
                 combined.save(filename)
-                print("[%d] Successfully Done!" % i)  # for debugging
+                print("[%d] Successfully Done!" % i)  # pick one picture randomly again # for debugging
                 break  # the infinite loop ends if the mask image is pasted
 
             except (UnboundLocalError, ValueError):
                 # UnboundLocalError: when the face cannot be found
                 # ValueError: when the pixel of top and bottom are selected in duplicate
-                pick_dir = random.choice([dir1, dir2])  # choose a directory randomly
-                move_files(dir2, end=1, add_num=i)  # pick one picture randomly again
+                dir_chosen = random.choice([dir1, dir2])  # choose a directory randomly
+                move_files(dir_chosen, end=1, add_num=i)  # pick one picture randomly again
