@@ -30,8 +30,8 @@ class Person(object):
         faces = self.detector(grey)
 
         for face in faces:
-            # x1, x2 = face.left(), face.right()
-            # y1, y2 = face.top(), face.bottom()
+            x1, x2 = face.left(), face.right()
+            y1, y2 = face.top(), face.bottom()
 
             facemarks = self.predictor(image=grey, box=face)
             # calculate the point to paste the mask image
@@ -66,14 +66,13 @@ class Person(object):
     # paste the mask image on the original person image
     def put_mask(self, mask_img, coordinate):
         img = self.img.copy().convert("RGBA")
-        rotated = mask_img.rotate(self.get_degree())
+        rotated = mask_img.rotate(self.get_de_0.egree())
         img.paste(rotated, coordinate, rotated.convert("RGBA"))
 
         return img
 
 
-# for testing the code
+# for testing the code (debugging)
 if __name__ == "__main__":
-    person = Person("faces_dataset/sample_0.jpg")
-    print(person.find_center())
-    print(person.get_degree())
+    person = Person("faces_dataset/picked/246.jpg")
+    print(person.find_lowerface())
