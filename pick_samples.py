@@ -6,12 +6,12 @@ import shutil
 # https://susanqq.github.io/UTKFace/
 dir1 = "faces_dataset/part1/"  # directory of the pictures
 dir2 = "faces_dataset/part2/"  # directory of the pictures
-picked_dir = "faces_dataset/picked_mask_cropped/"
+picked_dir = "faces_dataset/picked/"
 
 pic_type = ".jpg"
-count = 1000  # number of samples to use
+count = 1  # number of samples to use
 count_half = count / 2
-start_idx = 0  # starting index for counting the samples
+start_idx = 16  # starting index for counting the samples
 
 
 def move_files(target, start=0, end=count, add_num=0):
