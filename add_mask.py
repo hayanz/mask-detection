@@ -1,8 +1,5 @@
 from PIL import Image
-import numpy as np
 import cv2
-import dlib
-import random
 
 # import the custom modules
 from mask_images.mask_image import Mask
@@ -16,7 +13,7 @@ MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png
 COUNT = 645
 
 # path of images
-target_dir = "faces_dataset/picked_mask_cropped/"
+target_dir = "face_images/cropped/picked/"
 mask_dir = "mask_images/"
 
 # index of the starting point
@@ -53,7 +50,6 @@ if __name__ == "__main__":
 
                 # pick the color of the mask and define the class to access the image
                 img = person.img.convert("RGBA")
-                # maskfile = mask_dir + random.choice(MASKS)
                 maskfile = mask_dir + "white.png"
                 mask = Mask(maskfile)  # class of the mask image
 
