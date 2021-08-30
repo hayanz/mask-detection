@@ -67,8 +67,8 @@ class Face(object):
 # to crop the face part and save as a different file
 if __name__ == "__main__":
     # path of images
-    before_dir = "faces_dataset/picked/"
-    after_dir = "faces_dataset/picked_cropped/"
+    before_dir = "faces_images/without_cropped/picked/"
+    after_dir = "faces_images/cropped/picked/"
     # index of starting point and endpoint
     start, end = 500, 1000
     for i in range(start, end):
