@@ -23,11 +23,11 @@ if USE_CUDA == 'cuda':
     torch.cuda.random.manual_seed_all(6763088558125263)  # 6763088558125263: initial random seed of cuda
 
 batch_size = 20  # number of batch size
-num_iter = 5000  # total number of iterations
-best_accuracy = 0  # accuracy of the testset
+num_iter = 2000 # total number of iterations
+best_accuracy = 0  # accuracy of the test set
 start_epoch = 0  # initial epoch (changes if last checkpoint exists)
 learning_rate = 0.1  # learning rate to train the model
-ratio = 0.3  # (number of images in test set) / (number of all images)
+ratio = 0.2  # (number of images in test set) / (number of all images)
 
 # set the dataset with image files and labels
 images, labels = separate_csv(make_csv("dataset"))
@@ -51,64 +51,85 @@ scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 0.99)
 
 
 # to save the state of the model as the checkpoint
-def save_state(acc, epoch):
-    state = {'model': model.state_dict(), 'accuracy': acc, 'epoch': epoch}
+def save_state(acc, epoch, best=False):
+    global model, optimizer
+    state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'accuracy': acc, 'epoch': epoch}
     if not os.path.isdir('checkpoint'):
         os.mkdir('checkpoint')
-    torch.save(state, './checkpoint/point.pth')
-    return acc
+    if best:
+        torch.save(state, './checkpoint/best.pth')
+        print("The value of the best accuracy is updated.")
+    else:
+        torch.save(state, './checkpoint/saved.pth')
+        print("The state is saved.")
 
 
 # to load the state
 def load_state(resume=False):
-    global best_accuracy, start_epoch
+    global best_accuracy, start_epoch, model, optimizer
     if resume:
         # load the checkpoint
         print('==> Resuming from checkpoint..')
         assert os.path.isdir('checkpoint')
-        checkpoint = torch.load('./checkpoint/point.pth')
+        checkpoint = torch.load('./checkpoint/saved.pth')
         model.load_state_dict(checkpoint['model'])
-        best_accuracy = checkpoint['acc']
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        best_accuracy = checkpoint['accuracy']
         start_epoch = checkpoint['epoch']
 
 
 # to calculate the accuracy
 def calculate_acc(output, answer):
-    total = answer.size(0)
-    return output.eq(answer).sum().item() / float(total)
+    output[output > 0.5] = 1
+    output[output <= 0.5] = 0
+    acc = output.eq(answer).sum().float() / float(answer.size(0))
+    acc *= 100
+    return acc
 
 
 # to train the model
 def train_model(epoch):
+    global batch_size
+    global model, optimizer, criterion
     train_cost = 0  # initialization
+    train_best = 0  # maximum value of the accuracy (initialization)
+    acc_total = 0  # sum of whole accuracy to get the average (initialization)
     model.train()  # train the model
-    train_best = 0
+
     for batch_idx, (inputs, answers) in enumerate(train_loader):
         answers = answers.unsqueeze(-1)
         inputs, answers = inputs.to(DEVICE), answers.to(DEVICE)
+        answers = answers.type(torch.FloatTensor).cuda()
         predictions = model(inputs)
         # calculate the value of cost
         cost = criterion(predictions, answers)
         # calculate the hypothesis with the value of cost
         optimizer.zero_grad()
         cost.backward()
-        optimizer.step()
+        optimizer.step()  # update
 
-        train_cost += cost.item()
+        train_cost += cost.item()  # update
         accuracy = calculate_acc(predictions, answers)
+        acc_total += accuracy  # update
         if accuracy > train_best:
-            train_best = accuracy
+            train_best = accuracy  # update
         # print the result
-        print("[%d] batch: cost = %d, accuracy = %d" % (batch_idx, cost.item(), accuracy))
+        # print("[%d] batch: cost = %.5f, accuracy = %.5f" % (batch_idx, cost.item(), accuracy))
 
-    return train_cost, train_best
+    # calculate the average of the accuracy for one epoch
+    acc_mean = acc_total / float(len(train_loader))
+    print("total cost: %.5f | average accuracy: %.5f" % (train_cost, acc_mean))
+
+    return train_cost, train_best.item(), acc_mean.item()
 
 
 # to test the model
 def test_model(epoch):
-    global best_accuracy
-    test_cost = 0
-    test_best = 0
+    global best_accuracy, batch_size
+    global model, optimizer, criterion
+    test_cost = 0  # initialization
+    test_best = 0  # maximum value of the accuracy (initialization)
+    acc_total = 0  # sum of whole accuracy to get the average (initialization)
 
     with torch.no_grad():
         for batch_idx, (inputs, answers) in enumerate(test_loader):
@@ -118,23 +139,49 @@ def test_model(epoch):
             # calculate the value of cost
             cost = criterion(predicted, answers)
 
-            test_cost += cost.item()
-            accuracy = calculate_acc(inputs, answers)
+            test_cost += cost.item()  # update
+            accuracy = calculate_acc(predicted, answers)
+            acc_total += accuracy  # update
             if accuracy > test_best:
-                test_best = accuracy
+                test_best = accuracy  # update
             # print the result
-            print("[%d] batch: cost = %d, accuracy = %d" % (batch_idx, cost.item(), accuracy))
+            # print("[%d] batch: cost = %.5f, accuracy = %.5f" % (batch_idx, cost.item(), accuracy))
 
+    # calculate the average of the accuracy for one epoch
+    acc_mean = acc_total / float(len(test_loader))
+    print("total cost: %.5f | average accuracy: %.5f" % (test_cost, acc_mean))
     # save if it has the highest accuracy
-    if test_best > best_accuracy:
-        save_state(test_best, epoch)
-        best_accuracy = test_best  # update
+    if acc_mean > best_accuracy:
+        save_state(acc_mean, epoch, best=True)
+        best_accuracy = acc_mean  # update
 
-    return test_cost, test_best
+    return test_cost, test_best.item(), acc_mean.item()
+
+
+# save the result to a csv file
+def save_csv(epoch, train_result, test_result):
+    assert type(train_result) == list and type(test_result) == list
+    assert len(train_result) == 3 and len(test_result) == 3
+
+    if not os.path.isfile('checkpoint/result.csv'):  # check if csv file exists
+        with open('checkpoint/result.csv', 'w') as f:  # create a file
+            writer = csv.writer(f)
+            writer.writerow(['epoch', 'train_cost', 'train_max_acc', 'train_acc',
+                             'test_cost', 'test_max_acc', 'test_acc'])
+    result = [epoch + 1] + train_result + test_result  # list of the result to save
+
+    with open('checkpoint/result.csv', 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(result)
 
 
 if __name__ == "__main__":
-    # load_state(args.resume)
+    # load the state
+    load_state(args.resume)
+    # train the model
     for epoch in range(start_epoch, total_epochs):
         print("[%4d/%4d] Epoch" % (epoch + 1, total_epochs))
-        break  # TODO implement this
+        train_result = list(train_model(epoch))
+        test_result = list(test_model(epoch))
+        save_csv(epoch, train_result, test_result)
+        save_state(test_result[2], epoch)  # test_result[2] = the average accuracy of the test set
