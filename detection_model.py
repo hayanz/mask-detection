@@ -86,5 +86,6 @@ class Net(nn.Module):
 # for debugging
 if __name__ == "__main__":
     net = Net([3, 4, 6, 3])
+    print(net)  # for debugging
     y = net(torch.rand([1, 3, 128, 128]))
     print(y.size())
