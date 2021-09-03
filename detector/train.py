@@ -54,13 +54,13 @@ scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 0.99)
 def save_state(acc, epoch, best=False):
     global model, optimizer
     state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'accuracy': acc, 'epoch': epoch}
-    if not os.path.isdir('checkpoint'):
-        os.mkdir('checkpoint')
+    if not os.path.isdir('../checkpoint'):
+        os.mkdir('../checkpoint')
     if best:
-        torch.save(state, './checkpoint/best.pth')
+        torch.save(state, '../checkpoint/best.pth')
         print("The value of the best accuracy is updated.")
     else:
-        torch.save(state, './checkpoint/saved.pth')
+        torch.save(state, '../checkpoint/saved.pth')
         print("The state is saved.")
 
 
@@ -71,7 +71,7 @@ def load_state(resume=False):
         # load the checkpoint
         print('==> Resuming from checkpoint..')
         assert os.path.isdir('checkpoint')
-        checkpoint = torch.load('./checkpoint/saved.pth')
+        checkpoint = torch.load('../checkpoint/saved.pth')
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         best_accuracy = checkpoint['accuracy']
@@ -163,14 +163,14 @@ def save_csv(epoch, train_result, test_result):
     assert type(train_result) == list and type(test_result) == list
     assert len(train_result) == 3 and len(test_result) == 3
 
-    if not os.path.isfile('checkpoint/result.csv'):  # check if csv file exists
-        with open('checkpoint/result.csv', 'w') as f:  # create a file
+    if not os.path.isfile('../checkpoint/result.csv'):  # check if csv file exists
+        with open('../checkpoint/result.csv', 'w') as f:  # create a file
             writer = csv.writer(f)
             writer.writerow(['epoch', 'train_cost', 'train_max_acc', 'train_acc',
                              'test_cost', 'test_max_acc', 'test_acc'])
     result = [epoch + 1] + train_result + test_result  # list of the result to save
 
-    with open('checkpoint/result.csv', 'a') as f:
+    with open('../checkpoint/result.csv', 'a') as f:
         writer = csv.writer(f)
         writer.writerow(result)
 
