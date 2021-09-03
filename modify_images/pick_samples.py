@@ -14,6 +14,7 @@ count_half = count / 2
 start_idx = 16  # starting index for counting the samples
 
 
+# to access and move files
 def move_files(target, start=0, end=count, add_num=0):
     for i in range(start + add_num, end + add_num):
         chosen = random.choice(os.listdir(target))
