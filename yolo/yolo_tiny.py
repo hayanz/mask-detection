@@ -11,7 +11,8 @@ import numpy as np
 import ros_numpy
 
 
-'''def sample(probs):
+'''
+def sample(probs):
     s = sum(probs)
     probs = [a / s for a in probs]
     r = random.uniform(0, 1)
@@ -27,6 +28,7 @@ def c_array(ctype, values):
     arr[:] = values
     return arr
 '''
+
 
 def makedir(dir):
     dir = os.path.expanduser(os.path.join('~', 'darknet', dir))
@@ -195,6 +197,8 @@ def draw_bounding_box(img, item):
 
 
 center_list = []
+
+
 def image_callback(img_msg):
     bridge = CvBridge()
     cv_image = bridge.imgmsg_to_cv2(img_msg, "passthrough")
