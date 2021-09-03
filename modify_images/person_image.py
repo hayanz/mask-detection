@@ -74,5 +74,5 @@ class Person(object):
 
 # for testing the code (debugging)
 if __name__ == "__main__":
-    person = Person("../face_images/without_cropped/picked/246.jpg")
+    person = Person("../face_images/mask_sample_0.jpg")
     print(person.find_lowerface())
