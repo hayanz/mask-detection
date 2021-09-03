@@ -13,7 +13,7 @@ from cv_bridge import CvBridge, CvBridgeError
 # import the custom module
 import darknet
 
-# yolo image detection threshold value
+# yolo image detection threshold value/home/cylee/darknet/yolov3-tiny.weights
 THRESHOLD = 0.5
 
 
