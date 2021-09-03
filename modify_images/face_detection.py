@@ -12,7 +12,7 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # load an image to detect
-img = cv2.imread("../face_images/picked/246.jpg")
+img = cv2.imread("../face_images/mask_sample_1.jpg")
 # convert the image into grayscale
 grey = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
 faces = detector(grey)
