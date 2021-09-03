@@ -10,7 +10,7 @@ import pandas as pd
 
 master_path = "../datasets/"
 torch.manual_seed(1051325718700006030)  # 1051325718700006030: initial random seed
-if torch.cuda.is_available() == 'cuda':
+if torch.cuda.is_available():
     torch.cuda.random.manual_seed_all(6763088558125263)  # 6763088558125263: initial random seed of cuda
 
 
