@@ -76,14 +76,14 @@ def classify(prob):
 
 
 if __name__ == "__main__":
-    print("without mask...")
+    print("[not wearing a mask]")
     for i in range(4):
         test_path = "test_images/sample_%d.jpg" % i
         test_image = convert_image(test_path, crop=True)
         detector = load_detector(USE_CUDA)
         result = classify(detection(image=test_image, detector=detector).item())
         print(result)
-    print("with mask...")
+    print("[wearing a mask]")
     for i in range(12):
         test_path_1 = "test_images/mask_cropped/%d.jpg" % i
         test_image_1 = convert_image(test_path_1, crop=False)
