@@ -12,7 +12,7 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # load an image to detect
-img = cv2.imread("../face_images/mask_sample_1.jpg")
+img = cv2.imread("test_images/mask_not_cropped/15.jpg")
 # convert the image into grayscale
 grey = cv2.cvtColor(src=img, code=cv2.COLOR_BGR2GRAY)
 faces = detector(grey)
@@ -34,6 +34,9 @@ for face in faces:
     # draw a border of the face
     cv2.rectangle(img, (x1, y1), (x2, y2), color=(255, 0, 0), thickness=4)
 
-cv2.imshow("example", mat=img)
+cv2.imshow("example", mat=img[y1:y2, x1:x2])
 cv2.waitKey(3000)  # wait for 3 seconds
 cv2.destroyAllWindows()
+
+# crop the face part and save as a different file
+# cv2.imwrite("test_images/mask_cropped/11.jpg", img[y1:y2, x1:x2])
