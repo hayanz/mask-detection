@@ -1,5 +1,6 @@
 from PIL import Image
 import cv2
+import random
 
 # import the custom modules
 from mask_images.mask_image import Mask
@@ -8,7 +9,7 @@ from pick_samples import *  # to pick again if the face cannot be found at the p
 from face_crop import Face  # to detect the face part and crop the image
 
 # colors of the mask
-MASKS = ["white.png", "black.png", "black_grey.png", "white_grey.png", "grey.png"]
+MASKS = ["white.png", "black.png", "skyblue.png", "pink.png"]
 # number of images to fix (index of the endpoint)
 COUNT = 645
 
@@ -50,7 +51,7 @@ if __name__ == "__main__":
 
                 # pick the color of the mask and define the class to access the image
                 img = person.img.convert("RGBA")
-                maskfile = mask_dir + "white.png"
+                maskfile = mask_dir + random.choice(MASKS)
                 mask = Mask(maskfile)  # class of the mask image
 
                 # calculate the size with the ratio of the mask image
