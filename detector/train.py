@@ -10,12 +10,12 @@ import argparse
 
 # import custom modules
 from dataset_image import *
-from detection_model import Net
+from model_cnn import Net
 
 parser = argparse.ArgumentParser(description="Custom model training:")
-parser.add_argument("--resume", '-r', action='store_true', help="resume from checkpoint")
+parser.add_argument("--resume", '-r', action='store_true', help="resume from main_ckpt")
 args = parser.parse_args()
-
+    # model = Net([3, 4, 6, 3]).to(DEVICE)  # based on ResNet50
 USE_CUDA = 'cuda' if torch.cuda.is_available() else 'cpu'
 DEVICE = torch.device(USE_CUDA)
 torch.manual_seed(1051325718700006030)  # 1051325718700006030: initial random seed
@@ -23,11 +23,17 @@ if USE_CUDA == 'cuda':
     torch.cuda.random.manual_seed_all(6763088558125263)  # 6763088558125263: initial random seed of cuda
 
 batch_size = 20  # number of batch size
-num_iter = 1000  # total number of iterations
+num_iter = 2000  # total number of iterations
 best_accuracy = 0  # accuracy of the test set
-start_epoch = 0  # initial epoch (changes if last checkpoint exists)
+start_epoch = 0  # initial epoch (changes if last main_ckpt exists)
 learning_rate = 0.1  # learning rate to train the model
 ratio = 0.2  # (number of images in test set) / (number of all images)
+
+# set paths to save status
+folder_path = "additional_ckpt"
+best_path = folder_path + "/best_retried_1.pth"
+saved_path = folder_path + "/saved_retried.pth"
+csv_path = folder_path + "/result_retried.csv"
 
 # set the dataset with image files and labels
 images, labels = separate_csv(make_csv("dataset"))
@@ -50,17 +56,17 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 0.99)
 
 
-# to save the state of the model as the checkpoint
+# to save the state of the model as the main_ckpt
 def save_state(acc, epoch, best=False):
     global model, optimizer
     state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'accuracy': acc, 'epoch': epoch}
-    if not os.path.isdir('../checkpoint'):
-        os.mkdir('../checkpoint')
+    if not os.path.isdir(folder_path):
+        os.mkdir(folder_path)
     if best:
-        torch.save(state, '../checkpoint/best_1.pth')
+        torch.save(state, best_path)
         print("The value of the best accuracy is updated.")
     else:
-        torch.save(state, '../checkpoint/saved_1.pth')
+        torch.save(state, saved_path)
         print("The state is saved.")
 
 
@@ -68,14 +74,14 @@ def save_state(acc, epoch, best=False):
 def load_state(resume=False):
     global best_accuracy, start_epoch, model, optimizer
     if resume:
-        # load the checkpoint
-        print('==> Resuming from checkpoint..')
-        assert os.path.isdir('checkpoint')
-        checkpoint = torch.load('../checkpoint/saved_1.pth')
+        # load the main_ckpt
+        print('==> Resuming from main_ckpt..')
+        assert os.path.isdir(folder_path)
+        checkpoint = torch.load(saved_path)
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         best_accuracy = checkpoint['accuracy']
-        start_epoch = checkpoint['epoch']
+        start_epoch = checkpoint['epoch'] + 1
 
 
 # to calculate the accuracy
@@ -163,14 +169,14 @@ def save_csv(epoch, train_result, test_result):
     assert type(train_result) == list and type(test_result) == list
     assert len(train_result) == 3 and len(test_result) == 3
 
-    if not os.path.isfile('../checkpoint/result_1.csv'):  # check if csv file exists
-        with open('../checkpoint/result_1.csv', 'w') as f:  # create a file
+    if not os.path.isfile(csv_path):  # check if csv file exists
+        with open(csv_path, 'w') as f:  # create a file
             writer = csv.writer(f)
             writer.writerow(['epoch', 'train_cost', 'train_max_acc', 'train_acc',
                              'test_cost', 'test_max_acc', 'test_acc'])
     result = [epoch + 1] + train_result + test_result  # list of the result to save
 
-    with open('../checkpoint/result_1.csv', 'a') as f:
+    with open(csv_path, 'a') as f:
         writer = csv.writer(f)
         writer.writerow(result)
 
@@ -182,6 +188,7 @@ if __name__ == "__main__":
     for epoch in range(start_epoch, total_epochs):
         print("[%4d/%4d] Epoch" % (epoch + 1, total_epochs))
         train_result = list(train_model(epoch))
+
         test_result = list(test_model(epoch))
         save_csv(epoch, train_result, test_result)
         save_state(test_result[2], epoch)  # test_result[2] = the average accuracy of the test set
