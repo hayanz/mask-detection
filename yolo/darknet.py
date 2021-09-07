@@ -167,7 +167,7 @@ def detect_image(network, class_names, image, thresh=.5, hier_thresh=.5, nms=.45
 
 if os.name == "posix":
     cwd = os.path.dirname(__file__)
-    lib = CDLL("/home/cylee/PycharmProjects/cnn_project/yolo/libdarknet.so".encode('utf-8'), RTLD_GLOBAL)
+    lib = CDLL("/home/cylee/darknet/libdarknet.so".encode('utf-8'), RTLD_GLOBAL)
 elif os.name == "nt":
     cwd = os.path.dirname(__file__)
     os.environ['PATH'] = cwd + ';' + os.environ['PATH']

@@ -47,7 +47,7 @@ def image_callback(img_msg):
     image, detections = image_detection(
         cv_image, network, THRESHOLD, True
     )
-    print(detections) # ('label', 'probability', (x, y, width, height))
+    # print(detections) # ('label', 'probability', (x, y, width, height))
 
     cv2.imshow('img', image)
     cv2.waitKey(3)
