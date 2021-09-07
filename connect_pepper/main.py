@@ -4,10 +4,7 @@ import time
 import qi
 from naoqi import ALProxy
 
-
-# IP address of Pepper robot
-PEPPER_IP = "192.168.1.188"
-
+from pepper import Pepper, PEPPER_IP
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
