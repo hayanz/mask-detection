@@ -1,11 +1,21 @@
 import torch
 import torch.cuda.random
 import os
-import pyrealsense2 as rs
+import cv2
+import numpy as np
 
 # import custom modules
 from detector.model_cnn import Net
 from detector.dataset_image import ImageTransform
+
+# best model of main_ckpt: best_1.pth
+# best model of additional_ckpt: saved_seocnd.pth
+# detector_path = "main_ckpt/best_1.pth"
+detector_path = "main_ckpt/best_1.pth"
+classifier = {
+    0: 'no_mask',
+    1: 'mask'
+}
 
 
 USE_CUDA = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -30,8 +40,30 @@ def load_detector(filepath, cuda):
     return model
 
 
-def classify():
+def extract_faces(image, coordinates):
     pass  # TODO implement this
+
+
+# to detect the image with a trained model
+def detection(image, detector):
+    transform = ImageTransform(size=(128, 128))
+    image = torch.unsqueeze(transform(img=image), 0)  # transform an image for detecting
+    result = detector(image)
+    return result
+
+
+# to classify the image with the result
+def classify(prob):
+    if prob <= 0:
+        return classifier[0], 100
+    elif prob >= 1:
+        return classifier[1], 100
+    elif prob < 0.5:
+        accuracy = 100 * (1 - prob)
+        return classifier[0], accuracy
+    else:
+        accuracy = 100 * prob
+        return classifier[1], accuracy
 
 
 if __name__ == "__main__":
