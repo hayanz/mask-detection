@@ -4,7 +4,8 @@ import time
 import qi
 from naoqi import ALProxy
 
-from connect_pepper.pepper import Pepper, PEPPER_IP, PORT
+from connect_pepper.pepper import PEPPER_IP, PORT
+from main_detector import FaceDetector
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -25,8 +26,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # TODO implement this
-    pepper = Pepper(session)
-    pepper.record_video()
+    FaceDetector(session).main()
 
     '''
     # When program exit, set default display page
