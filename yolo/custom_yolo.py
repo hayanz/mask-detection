@@ -3,9 +3,9 @@ import cv2
 import os
 import numpy as np
 
+# import ROS modules
 import rospy
 import pyrealsense2 as rs
-
 from glob import glob
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -47,10 +47,13 @@ def image_callback(img_msg):
     image, detections = image_detection(
         cv_image, network, THRESHOLD, True
     )
-    # print(detections) # ('label', 'probability', (x, y, width, height))
+    # print(detections)  # ('label', 'probability', (x, y, width, height)), for debugging
+    _, _, coordinates = detections
 
     cv2.imshow('img', image)
     cv2.waitKey(3)
+
+    return image, coordinates
 
 
 network = darknet.load_network(
