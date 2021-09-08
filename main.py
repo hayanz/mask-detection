@@ -4,13 +4,13 @@ import time
 import qi
 from naoqi import ALProxy
 
-from pepper import Pepper, PEPPER_IP
+from connect_pepper.pepper import Pepper, PEPPER_IP, PORT
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, default=PEPPER_IP,
                         help="Robot IP address. On robot or Local Naoqi: use '192.168.1.188'.")
-    parser.add_argument("--port", type=int, default=9559,
+    parser.add_argument("--port", type=int, default=PORT,
                         help="Naoqi port number")
 
     args = parser.parse_args()
@@ -25,6 +25,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # TODO implement this
+    pepper = Pepper(session)
+    pepper.record_video()
 
     '''
     # When program exit, set default display page

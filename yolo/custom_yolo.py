@@ -54,9 +54,9 @@ def image_callback(img_msg):
 
 
 network = darknet.load_network(
-        "data/obj.cfg",
-        "data/obj.data",
-        "data/obj_10000.weights",
+        "yolo_dataset/obj.cfg",
+        "yolo_dataset/obj.data",
+        "yolo_dataset/obj_10000.weights",
         batch_size=1
     )
 
@@ -69,3 +69,6 @@ def listener():
 
 if __name__ == "__main__":
     listener()
+
+# type this to terminal at first
+# roslaunch realsense2_camera rs_rgbd.launch enable_pointcloud2:=true
