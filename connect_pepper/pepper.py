@@ -8,7 +8,7 @@ import time
 from camera import Camera
 
 # settings of Pepper robot
-PEPPER_IP = "192.168.1.188"  # IP address of Pepper robot
+PEPPER_IP = "192.168.1.123"  # IP address of Pepper robot
 PORT = 9559  # number of the port to connect with Pepper robot (default value)
 VALID = 0.35
 VOLUME = 0.8
@@ -72,10 +72,11 @@ class Pepper:
         tts = self.srv['tts']
         assert type(truth) == bool
         if not truth:
-            print("Cannot find a mask!")  # for debugging
+            # print("Cannot find a mask!")  # for debugging
             tts.say("Put on your mask.")
         else:
-            print("Found a mask")  # for debugging
+            return
+            # print("Found a mask")  # for debugging
 
     def set_video(self):
         camera = self.camera
@@ -88,6 +89,10 @@ class Pepper:
     def record_video(self):
         camera = self.camera
         camera.record_video()
+
+    def capture_image(self):
+        camera = self.camera
+        return camera.capture_image()
 
     def access_camera(self, start=True):
         camera = self.camera

@@ -70,7 +70,7 @@ class Camera:
         print("Total number of frames: ", video_info[0])  # for debugging
 
     def capture_image(self):
-        img_count = 10  # TODO change this value
+        img_count = 1  # TODO change this value
         for img_idx in range(img_count):
             video_device = self.srv['video_device']
             video_client = video_device.subscribe("python_client", RESOLUTION, COLORSPACE, FPS)
@@ -81,10 +81,12 @@ class Camera:
             image_string = str(bytearray(array))
             im = Image.frombytes("RGB", (width, height), image_string)
 
-            img_path = os.path.sep.join([self.directory, str(img_idx) + ".jpg"])
-            im.save(img_path, "JPEG")
-            im.show()  # for debugging
-            time.sleep(0.01)
+            # img_path = os.path.sep.join([self.directory, "cpatured.jpg"])
+            # im.save(img_path, "JPEG")
+            # im.show()  # for debugging
+            # time.sleep(0.01)
+
+        return im
 
     def open(self):
         video = self.srv['video_device']
