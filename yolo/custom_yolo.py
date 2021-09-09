@@ -4,8 +4,6 @@ import os
 import numpy as np
 
 # import ROS modules
-import rospy
-import pyrealsense2 as rs
 from glob import glob
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -57,9 +55,9 @@ def image_callback(img_msg):
 
 
 network = darknet.load_network(
-        "yolo_dataset/obj.cfg",
-        "yolo_dataset/obj.data",
-        "yolo_dataset/obj_10000.weights",
+        "/home/tidy/Downloads/data_fr_face/obj.cfg",
+        "/home/tidy/Downloads/data_fr_face/obj.data",
+        "/home/tidy/Downloads/data_fr_face/obj_10000.weights",
         batch_size=1
     )
 
