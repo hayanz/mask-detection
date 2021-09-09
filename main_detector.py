@@ -3,6 +3,7 @@ detector mainly used with yolo, naoqi and trained CNN model(torch)
 """
 
 from __future__ import print_function
+import numpy as np
 from PIL import Image
 import cv2
 import os
@@ -11,19 +12,13 @@ import sys
 import torch
 import torch.cuda.random
 
-# import ROS modules
-import rospy
-from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
-from cv_bridge import CvBridge
-from sensor_msgs.msg import Image as Img
-
 # import naoqi modules
 import qi
 from naoqi import ALProxy
 
 # import custom yolo modules
 import yolo.darknet as dn
-import yolo.custom_yolo as yl
+from yolo.custom_yolo import image_detection, network
 from yolo.yolo_class import Yolo  # use yolo as a class
 
 # import custom modules
@@ -50,42 +45,49 @@ class FaceDetector:
         self.port = self.pepper.port
         self.threshold = self.pepper.threshold  # for finding a face part
         self.criterion = 0.5  # criterion of classification
+        self.width, self.height = 640, 480
 
         self.detector = Detector()
 
-        # for using yolo
-        self.options = {"model": "obj.cfg", "load": "obj_10000.weights",
-                        "data": "obj.data", "threshold": self.threshold,
-                        "gpu": 0.2, "summary": None}
-        # darknet
-        dn.set_gpu(0)
-        self.net = dn.load_net(self.options['model'], self.options['load'], self.options['data'], batch_size=1)
-        self.meta = dn.load_meta(self.options['data'])
-        # declaration of yolo with a custom module
-        self.yolo = Yolo(model="obj.cfg", load="obj_10000.weights", datapath=YOLO_PATH)
-        self.cv_net = self.yolo.net
-        self.classes = self.yolo.classes
-
-        self.cam_topic = "pepper_robot/camera/front/image_raw"
-        self.cam_sub = rospy.Subscriber(self.cam_topic, Img, self.image_callback, queue_size=1)
-
-    def image_callback(self, msg):
-        self.detect(msg)
-
-    def detect(self, msg):
+    def detect(self, pil_img):
         detector = self.detector
-        image, coordinates = yl.image_callback(msg)
-        x1, y1, w, h = coordinates
-        x2, y2 = x1 + w, y1 + h
-        cropped = Image.fromarray(image[y1:y2, x1:x2])  # crop the image and convert for detection
-        calculated = detector.calculate(cropped)
-        _, classified = detector.classify(calculated, self.criterion)
-        self.pepper.reaction(classified)
+        # convert pillow image to cv2 format
+        cv_image = np.array(pil_img)
+        cv_image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2BGR)
+        image, detections = image_detection(cv_image, network, self.threshold, True)
+        cv2.imshow('img', image)
+        cv2.waitKey(3)
+        if len(detections) == 0:
+            return
+        for item in detections:
+            _, prob, coordinates = item
+            x1, y1, w, h = coordinates
+            x1, y1 = x1 - w/2, y1 - h/2
+            x2, y2 = x1 + w, y1 + h
+            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+            x1, y1, x2, y2 = self.edit_size(x1, y1, x2, y2)
+            croped_cv_image = cv_image[y1:y2, x1:x2]
+            cropped = Image.fromarray(croped_cv_image)  # crop the image and convert for detection
+            calculated = detector.calculate(cropped)
+            _, classified = detector.classify(calculated, self.criterion)
+            self.pepper.reaction(classified)
+
+    def edit_size(self, x1, y1, x2, y2):
+        if int(y2) >= self.height:
+            y2 -= 1
+        if int(y1) <= 0:
+            y1 = 0
+        if int(x2) >= self.width:
+            x2 -= 1
+        if int(x1) <= 0:
+            x1 = 0
+
+        return x1, y1, x2, y2
 
     def main(self):
-        rospy.init_node('yolo_detector', anonymous=True)
-        rospy.Subscriber(self.cam_topic, Img, self.image_callback)
-        rospy.spin()
+        while True:
+            pil_img = self.pepper.capture_image()
+            self.detect(pil_img)
 
 
 class Detector:
@@ -119,7 +121,8 @@ class Detector:
 
     # classify the image with the result value
     def classify(self, value, criteria):
-        if value < criteria:
+        print(value.item())
+        if value.item() < criteria:
             return self.classifier[0]
         else:
             return self.classifier[1]
